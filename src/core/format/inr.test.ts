@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatInr, formatInrCompact, groupIndian, paiseToDecimal } from './inr';
+import { formatInr, formatInrAxis, formatInrCompact, groupIndian, paiseToDecimal } from './inr';
 
 describe('groupIndian', () => {
   it.each([
@@ -67,5 +67,17 @@ describe('paiseToDecimal', () => {
     expect(paiseToDecimal(12345678)).toBe('123456.78');
     expect(paiseToDecimal(5)).toBe('0.05');
     expect(paiseToDecimal(-50000)).toBe('-500.00');
+  });
+});
+
+describe('formatInrAxis', () => {
+  it('uses thousand, lakh and crore units', () => {
+    expect(formatInrAxis(0)).toBe('₹0');
+    expect(formatInrAxis(500_00)).toBe('₹500');
+    expect(formatInrAxis(2_500_00)).toBe('₹2.5K');
+    expect(formatInrAxis(10_000_00)).toBe('₹10K');
+    expect(formatInrAxis(1_20_000_00)).toBe('₹1.2L');
+    expect(formatInrAxis(3_00_00_000_00)).toBe('₹3Cr');
+    expect(formatInrAxis(-2_500_00)).toBe('−₹2.5K');
   });
 });

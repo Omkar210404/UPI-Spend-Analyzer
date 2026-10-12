@@ -61,3 +61,17 @@ export function paiseToDecimal(paise: number): string {
   const text = `${Math.floor(absolute / 100)}.${String(absolute % 100).padStart(2, '0')}`;
   return negative ? `-${text}` : text;
 }
+
+/**
+ * A very short form for chart axes, in Indian units: `₹500`, `₹2.5K`, `₹1.2L`, `₹3Cr`.
+ */
+export function formatInrAxis(paise: number): string {
+  const negative = paise < 0;
+  const rupees = Math.abs(paise) / 100;
+  const sign = negative ? MINUS : '';
+  const short = (value: number): string => value.toFixed(1).replace(/\.0$/, '');
+  if (rupees >= 1_00_00_000) return `${sign}₹${short(rupees / 1_00_00_000)}Cr`;
+  if (rupees >= 1_00_000) return `${sign}₹${short(rupees / 1_00_000)}L`;
+  if (rupees >= 1000) return `${sign}₹${short(rupees / 1000)}K`;
+  return `${sign}₹${Math.round(rupees)}`;
+}
