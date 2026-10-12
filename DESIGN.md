@@ -20,42 +20,42 @@ this". Nothing else is coloured.
 
 ### Light theme (default)
 
-| Token | Value | Use | Contrast |
-| --- | --- | --- | --- |
-| `--paper` | `#f5f2ea` | page background | |
-| `--surface` | `#fffdf8` | cards, tables, chart surface | |
-| `--sunken` | `#ece8dc` | inputs at rest, empty heatmap days | |
-| `--rule` | `#ddd8cb` | hairlines and borders | |
-| `--ink` | `#14201f` | primary text, figures | 14.9:1 on paper |
-| `--ink-2` | `#47524f` | secondary text | 7.3:1 on paper |
-| `--ink-3` | `#66716d` | captions, axis labels | 4.5:1 on paper, 5.0:1 on surface |
-| `--teal` | `#0f5e5a` | buttons, links, focus ring | 7.5:1 on surface |
-| `--teal-tint` | `#dcebe8` | selected states, quiet highlights | |
-| `--saffron` | `#e8912d` | signal stamp fill, badge edge | fill only, never text |
-| `--saffron-ink` | `#7a4100` | text on a saffron tint | 6.9:1 on tint |
-| `--saffron-tint` | `#fbebd3` | signal and badge background | |
-| `--danger` | `#a3321f` | errors, destructive actions | 6.8:1 on surface |
+| Token            | Value     | Use                                | Contrast                         |
+| ---------------- | --------- | ---------------------------------- | -------------------------------- |
+| `--paper`        | `#f5f2ea` | page background                    |                                  |
+| `--surface`      | `#fffdf8` | cards, tables, chart surface       |                                  |
+| `--sunken`       | `#ece8dc` | inputs at rest, empty heatmap days |                                  |
+| `--rule`         | `#ddd8cb` | hairlines and borders              |                                  |
+| `--ink`          | `#14201f` | primary text, figures              | 14.9:1 on paper                  |
+| `--ink-2`        | `#47524f` | secondary text                     | 7.3:1 on paper                   |
+| `--ink-3`        | `#66716d` | captions, axis labels              | 4.5:1 on paper, 5.0:1 on surface |
+| `--teal`         | `#0f5e5a` | buttons, links, focus ring         | 7.5:1 on surface                 |
+| `--teal-tint`    | `#dcebe8` | selected states, quiet highlights  |                                  |
+| `--saffron`      | `#e8912d` | signal stamp fill, badge edge      | fill only, never text            |
+| `--saffron-ink`  | `#7a4100` | text on a saffron tint             | 6.9:1 on tint                    |
+| `--saffron-tint` | `#fbebd3` | signal and badge background        |                                  |
+| `--danger`       | `#a3321f` | errors, destructive actions        | 6.8:1 on surface                 |
 
 ### Dark theme
 
 Designed on its own, not inverted: the paper becomes deep green-black slate rather than grey,
 the teal is lifted so it still reads as ink, and saffron is softened so it does not glare.
 
-| Token | Value | Contrast |
-| --- | --- | --- |
-| `--paper` | `#0f1716` | |
-| `--surface` | `#162120` | |
-| `--sunken` | `#1d2b29` | |
-| `--rule` | `#2a3836` | |
-| `--ink` | `#e8efec` | 15.6:1 on paper |
-| `--ink-2` | `#b4c0bc` | 9.7:1 on paper |
-| `--ink-3` | `#93a19d` | 6.2:1 on surface |
-| `--teal` | `#6fd0c4` | 9.0:1 on surface; button text is `--paper` on teal (10.0:1) |
-| `--teal-tint` | `#1c3a37` | |
-| `--saffron` | `#f2b866` | |
-| `--saffron-ink` | `#f2b866` | 8.2:1 on tint |
-| `--saffron-tint` | `#33270f` | |
-| `--danger` | `#f09a8a` | 7.6:1 on surface |
+| Token            | Value     | Contrast                                                    |
+| ---------------- | --------- | ----------------------------------------------------------- |
+| `--paper`        | `#0f1716` |                                                             |
+| `--surface`      | `#162120` |                                                             |
+| `--sunken`       | `#1d2b29` |                                                             |
+| `--rule`         | `#2a3836` |                                                             |
+| `--ink`          | `#e8efec` | 15.6:1 on paper                                             |
+| `--ink-2`        | `#b4c0bc` | 9.7:1 on paper                                              |
+| `--ink-3`        | `#93a19d` | 6.2:1 on surface                                            |
+| `--teal`         | `#6fd0c4` | 9.0:1 on surface; button text is `--paper` on teal (10.0:1) |
+| `--teal-tint`    | `#1c3a37` |                                                             |
+| `--saffron`      | `#f2b866` |                                                             |
+| `--saffron-ink`  | `#f2b866` | 8.2:1 on tint                                               |
+| `--saffron-tint` | `#33270f` |                                                             |
+| `--danger`       | `#f09a8a` | 7.6:1 on surface                                            |
 
 Light is the default for every first visit. Dark is a choice the user makes with the toggle,
 and the choice is remembered in this browser.
@@ -66,12 +66,12 @@ Chosen with a palette validator (lightness band, chroma floor, colour-vision-def
 separation, contrast against the chart surface), not by eye. All sets below pass every check
 on their own surface.
 
-| Job | Light | Dark |
-| --- | --- | --- |
-| Money out (series 1) | `#008f80` | `#14a394` |
-| Money in (series 2) | `#7458c4` | `#8a7fe0` |
-| Previous period (context) | `#b9b3a4` | `#4a5a57` |
-| Heatmap, low to high | `#7fbfb5` `#4fa398` `#23857b` `#0d625c` `#083f3c` | `#27635d` `#2a8177` `#36a295` `#62c4b7` `#a6e6dc` |
+| Job                       | Light                                             | Dark                                              |
+| ------------------------- | ------------------------------------------------- | ------------------------------------------------- |
+| Money out (series 1)      | `#008f80`                                         | `#14a394`                                         |
+| Money in (series 2)       | `#7458c4`                                         | `#8a7fe0`                                         |
+| Previous period (context) | `#b9b3a4`                                         | `#4a5a57`                                         |
+| Heatmap, low to high      | `#7fbfb5` `#4fa398` `#23857b` `#0d625c` `#083f3c` | `#27635d` `#2a8177` `#36a295` `#62c4b7` `#a6e6dc` |
 
 Rules:
 
@@ -79,7 +79,7 @@ Rules:
   the label and the figure identify the category.
 - Two series get a legend and are never told apart by colour alone.
 - Text is never painted in a series colour. Values and labels use ink tokens.
-- The heatmap is one hue, lighter to darker. A day with no spend is an empty `--sunken` cell.
+- The heatmap is one hue. In the light theme more spend is darker; in the dark theme it is brighter. A day with no spend is an empty `--sunken` cell.
 - Gridlines are solid hairlines in `--rule`. Bars are at most 24px thick, rounded 4px at the
   data end, square at the baseline.
 - Every chart has a "view as table" twin and a hover or focus read-out. A tooltip is never the
@@ -91,15 +91,15 @@ One family, bundled with the app: **Figtree** (variable, weights 400 to 700; two
 about 30 kB together; the second file carries the rupee sign). Reference numbers and UPI
 handles use the system monospace stack.
 
-| Role | Size / line | Weight |
-| --- | --- | --- |
-| Hero figure | 44px / 1.05 (32px on phones) | 600 |
-| Tile figure | 28px / 1.1 | 600 |
-| Page title | 26px / 1.2 | 650 |
-| Section title | 18px / 1.3 | 650 |
-| Body | 16px / 1.55 | 400 |
-| Table and controls | 15px / 1.45 | 400 to 550 |
-| Caption, axis | 13px / 1.4 | 500 |
+| Role               | Size / line                  | Weight     |
+| ------------------ | ---------------------------- | ---------- |
+| Hero figure        | 44px / 1.05 (32px on phones) | 600        |
+| Tile figure        | 28px / 1.1                   | 600        |
+| Page title         | 26px / 1.2                   | 650        |
+| Section title      | 18px / 1.3                   | 650        |
+| Body               | 16px / 1.55                  | 400        |
+| Table and controls | 15px / 1.45                  | 400 to 550 |
+| Caption, axis      | 13px / 1.4                   | 500        |
 
 - **Every amount uses tabular numerals** (`font-variant-numeric: tabular-nums`), so figures
   line up in columns and do not jitter when a filter changes them.
