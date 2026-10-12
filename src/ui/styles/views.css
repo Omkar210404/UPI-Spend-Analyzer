@@ -793,3 +793,34 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- Small fixes that apply at every width ---------- */
+
+.page-head .sample-badge {
+  justify-self: start;
+}
+
+.detail-list > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.statement-row .button {
+  flex: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .tile:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .statement-row {
+    align-items: flex-start;
+  }
+
+  .statement-summary {
+    display: grid;
+  }
+}

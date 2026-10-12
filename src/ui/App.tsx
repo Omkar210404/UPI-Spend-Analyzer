@@ -4,7 +4,7 @@ import { categoriseAll } from '../core/categorise/categoriser';
 import type { SafeStore } from '../core/storage/storage';
 import { Header } from './components/Header';
 import { AppContext } from './context';
-import { initialState, reducer, TABS, type AppState, type Tab } from './state';
+import { initialState, reducer, type AppState } from './state';
 import { AboutView } from './views/AboutView';
 import { MappingView } from './views/MappingView';
 import { OverviewView } from './views/OverviewView';
@@ -12,11 +12,6 @@ import { RulesView } from './views/RulesView';
 import { SignalsView } from './views/SignalsView';
 import { StartView } from './views/StartView';
 import { TransactionsView } from './views/TransactionsView';
-
-function tabFromHash(): Tab | null {
-  const hash = window.location.hash.replace(/^#/, '');
-  return TABS.find((tab) => tab.id === hash)?.id ?? null;
-}
 
 /** Saves settings whenever they change. Transactions are never written anywhere. */
 function usePersistence(state: AppState, store: SafeStore): void {
@@ -40,19 +35,17 @@ export function App({ store, initial }: { store: SafeStore; initial: AppState })
     [statement, settings.rules, settings.overrides],
   );
 
-  // The tab lives in the URL hash, so the browser's back button moves between
-  // tabs instead of leaving the page and losing the statement.
+  // The statement exists only in this tab's memory, so leaving the page loses
+  // it. Ask before that happens to a statement the user imported themselves.
+  // (The tab is deliberately not kept in the URL: changing the URL makes
+  // browsers fetch the page icon again, and this page makes no requests after load.)
+  const hasOwnStatement = statement !== null && statement.source !== 'sample';
   useEffect(() => {
-    const onHashChange = () => {
-      const tab = tabFromHash();
-      if (tab) dispatch({ type: 'set-tab', tab });
-    };
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
-  useEffect(() => {
-    if (statement && tabFromHash() !== state.tab) window.location.hash = state.tab;
-  }, [statement, state.tab]);
+    if (!hasOwnStatement) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [hasOwnStatement]);
 
   // Move focus to the main heading when the screen changes, so keyboard and
   // screen-reader users land at the top of the new content.

@@ -323,7 +323,7 @@ export function OverviewView() {
           id="calendar"
           wide
           title="Spend by day"
-          subtitle="Money out on each day. Darker means more. The steps are fifths of the days that had any spend, so one large payment does not wash out the rest."
+          subtitle="Money out on each day. A stronger colour means more. The steps are fifths of the days that had any spend, so one large payment does not wash out the rest."
         >
           <ChartWithTable
             label="money out by day"

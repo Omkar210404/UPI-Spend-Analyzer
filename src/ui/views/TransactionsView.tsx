@@ -134,6 +134,7 @@ export function TransactionsView() {
   const { overrides } = state.settings;
   const [page, setPage] = useState(0);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
 
   const byMerchant = useMemo(() => {
     const groups = new Map<string, CategorisedTxn[]>();
@@ -149,6 +150,9 @@ export function TransactionsView() {
     const words = filter.search.toLowerCase().split(/\s+/).filter(Boolean);
     return txns
       .filter((txn) => {
+        // A row whose category was just changed stays in view, even if it no
+        // longer matches the category filter, so the follow-up actions are reachable.
+        if (txn.id === pinnedId) return true;
         if (!inPeriod(txn, period)) return false;
         if (filter.direction !== 'all' && txn.direction !== filter.direction) return false;
         if (filter.category !== 'all' && txn.category !== filter.category) return false;
@@ -158,10 +162,13 @@ export function TransactionsView() {
         return words.every((word) => text.includes(word));
       })
       .reverse();
-  }, [txns, filter, period]);
+  }, [txns, filter, period, pinnedId]);
 
-  // A new filter starts again from the first page.
-  useEffect(() => setPage(0), [filter, period]);
+  // A new filter starts again from the first page and lets go of the pinned row.
+  useEffect(() => {
+    setPage(0);
+    setPinnedId(null);
+  }, [filter, period]);
 
   const pages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const current = Math.min(page, pages - 1);
@@ -182,6 +189,7 @@ export function TransactionsView() {
       notice: `${txn.merchantName} on ${formatDate(txn.date)} is now ${categoryLabel(category)}.`,
     });
     setOpenId(txn.id);
+    setPinnedId(txn.id);
   };
 
   return (
