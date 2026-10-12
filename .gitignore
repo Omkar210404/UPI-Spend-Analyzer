@@ -1,0 +1,43 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+coverage/
+*.tsbuildinfo
+
+# Claude Code local settings
+.claude/
+
+# ---------------------------------------------------------------------------
+# Never commit a real statement.
+# Every statement-like file type is ignored everywhere in the repo. The only
+# exception is the synthetic sample that scripts/generate-sample.mjs writes.
+# ---------------------------------------------------------------------------
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.xlsm
+*.ods
+*.pdf
+*.ofx
+*.qfx
+*.qif
+*.mt940
+*[Ss]tatement*
+*[Pp]assbook*
+OpTransactionHistory*
+AccountStatement*
+!src/sample/sample-statement.csv
+
+# editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
