@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-IN" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Analyse a bank or UPI statement export entirely in your browser. No upload, no server, no account."
+    />
+    <title>UPI Spend Analyzer</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- Fonts are bundled with the app and fetched while the page loads, never later. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/src/ui/fonts/figtree-latin.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/src/ui/fonts/figtree-latin-ext.woff2"
+    />
+    <!-- Applies a saved dark theme before first paint. A file, not inline: the policy allows no inline script. -->
+    <script src="./theme-init.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <p class="noscript">
+        UPI Spend Analyzer does all of its work in your browser, so it needs JavaScript switched on.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

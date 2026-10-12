@@ -1,0 +1,48 @@
+{
+  "name": "upi-spend-analyzer",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Privacy-first analysis of a bank or UPI statement export, entirely in the browser",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "sample": "node scripts/generate-sample.mjs",
+    "check:dist": "node scripts/check-dist.mjs",
+    "check:repo": "node scripts/check-repo.mjs",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "dependencies": {
+    "chart.js": "4.5.1",
+    "papaparse": "5.7.0",
+    "pdfjs-dist": "6.4.299",
+    "preact": "11.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "@types/papaparse": "5.5.2",
+    "eslint": "10.12.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "playwright-core": "1.64.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}
