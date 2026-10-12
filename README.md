@@ -1,11 +1,11 @@
 # UPI Spend Analyzer
 
-[![CI](https://github.com/Omkar210404/upi-spend-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/Omkar210404/upi-spend-analyzer/actions/workflows/ci.yml)
+[![CI](https://github.com/Omkar210404/UPI-Spend-Analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/Omkar210404/UPI-Spend-Analyzer/actions/workflows/ci.yml)
 
 Analyse a bank or UPI statement export **entirely inside your browser**. No server, no upload,
 no account, no analytics.
 
-**Live demo:** https://omkar210404.github.io/upi-spend-analyzer/ (press "Try with sample data")
+**Live demo:** https://omkar210404.github.io/UPI-Spend-Analyzer/ (press "Try with sample data")
 
 ![The overview on the synthetic sample statement, light theme](docs/screenshots/overview-light.png)
 
@@ -356,7 +356,7 @@ fails on a statement file or on anything shaped like a PAN, a mobile number or a
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `main`.
 One-time setup in the repository: **Settings > Pages > Source: GitHub Actions**. The build uses
-relative paths, so it works under `/upi-spend-analyzer/` with no configuration.
+relative paths, so it works under `/UPI-Spend-Analyzer/` with no configuration.
 
 ## Future ideas
 
