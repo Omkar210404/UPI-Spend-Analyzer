@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseCsvText } from './csv';
-import { buildTable, detectHeaderRow, headerKind, headerSignature } from './table';
+import { buildTable, detectHeaderRow, headerKind, headerSignature, NO_HEADER_ROW } from './table';
 
 describe('parseCsvText', () => {
   it('splits rows and trims cells', () => {
@@ -88,8 +88,24 @@ describe('detectHeaderRow', () => {
   });
 
   it('falls back to the first row when nothing looks like a header', () => {
-    expect(detectHeaderRow([['01/01/2026', 'TEA', '20.00']])).toBe(0);
+    expect(
+      detectHeaderRow([
+        ['Some', 'Words'],
+        ['01/01/2026', 'TEA'],
+      ]),
+    ).toBe(0);
     expect(detectHeaderRow([])).toBe(0);
+  });
+
+  it('reports no header at all when the first row is already data', () => {
+    const rows = [
+      ['13/01/2026', 'ATM WDL DEMO NAGAR', '2000.00'],
+      ['14/01/2026', 'TEA', '20.00'],
+    ];
+    expect(detectHeaderRow(rows)).toBe(NO_HEADER_ROW);
+    const table = buildTable(rows, NO_HEADER_ROW);
+    expect(table.header).toEqual(['Column 1', 'Column 2', 'Column 3']);
+    expect(table.rows).toHaveLength(2);
   });
 });
 

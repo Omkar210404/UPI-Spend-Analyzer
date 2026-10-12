@@ -1,3 +1,5 @@
+import { detectDateFormat } from './dates';
+
 /**
  * Finds the transaction table inside a statement export.
  *
@@ -66,10 +68,14 @@ export function headerKind(cell: string): HeaderKind | null {
 
 const SCAN_LIMIT = 60;
 
+/** Header row index meaning "this file has no heading line; every row is data". */
+export const NO_HEADER_ROW = -1;
+
 /**
  * Picks the header row: the first row, among the first 60, that names a date
  * column and at least two other known columns. If no row does, the row with
- * the most known column names wins, and failing that the first row.
+ * the most known column names wins, and failing that the first row, unless the
+ * first row is plainly data, in which case the file has no header (NO_HEADER_ROW).
  */
 export function detectHeaderRow(rows: readonly (readonly string[])[]): number {
   let bestIndex = 0;
@@ -87,7 +93,12 @@ export function detectHeaderRow(rows: readonly (readonly string[])[]): number {
       bestIndex = index;
     }
   }
-  return bestScore >= 2 ? bestIndex : 0;
+  if (bestScore >= 2) return bestIndex;
+  // Nothing reads like headings. If the first row already holds a date, the
+  // file has no heading line at all, and treating row one as headings would lose it.
+  const first = rows[0] ?? [];
+  const startsWithData = first.some((cell) => detectDateFormat([cell]).format !== null);
+  return startsWithData ? NO_HEADER_ROW : 0;
 }
 
 /** Builds the table from a chosen header row. Every data row gets the header's width. */

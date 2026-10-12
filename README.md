@@ -210,7 +210,7 @@ PDF is chosen.
 
 From the last run on this machine:
 
-- `npm test`: **459 tests in 17 files, all passing.** They cover date parsing and format
+- `npm test`: **460 tests in 17 files, all passing.** They cover date parsing and format
   detection; amount parsing including lakh grouping, `Dr`/`Cr` markers and floating-point traps;
   header detection and all three amount layouts in column mapping; sensitive-column detection;
   narration scrubbing; every example of every narration pattern, twice (the pattern reads it,
@@ -230,7 +230,8 @@ accuracy on real statements, which has not been measured.
 
 **CSV** (also tab, semicolon or pipe separated) is the reliable route.
 
-- Lines above the column headings are skipped; the header row can be corrected by hand.
+- Lines above the column headings are skipped; the header row can be corrected by hand, and a
+  file with no heading line at all is read with numbered columns.
 - Dates: `dd/mm/yyyy`, `dd-mm-yyyy`, `dd.mm.yyyy`, `dd/mm/yy`, `dd-Mon-yyyy`, `dd Mon yy`,
   `dd Month yyyy`, `yyyy-mm-dd`, `mm/dd/yyyy`, `Mon dd, yyyy`, each with an optional time. The
   format is detected from the whole column. When day-first and month-first both fit, day-first

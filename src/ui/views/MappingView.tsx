@@ -190,19 +190,20 @@ export function MappingView() {
             <input
               id="map-header-row"
               type="number"
-              min={1}
+              min={0}
               max={Math.max(1, pending.fileRows.length - 1)}
               value={table.headerRowIndex + 1}
               onChange={(event) => {
                 const row = Number(event.currentTarget.value);
-                if (Number.isInteger(row) && row >= 1 && row < pending.fileRows.length) {
+                if (Number.isInteger(row) && row >= 0 && row < pending.fileRows.length) {
                   dispatch({ type: 'set-header-row', index: row - 1 });
                 }
               }}
             />
             <p class="field-hint">
-              The line of the file that names the columns. Anything above it (the bank's block about
-              the account) is discarded: {plural(table.headerRowIndex, 'line')} here.
+              {table.headerRowIndex < 0
+                ? 'This file has no line naming its columns, so every line is read as a transaction and the columns are numbered.'
+                : `The line of the file that names the columns. Anything above it (the bank's block about the account) is discarded: ${plural(table.headerRowIndex, 'line')} here. Use 0 if the file has no such line.`}
             </p>
           </div>
 
