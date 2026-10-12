@@ -38,7 +38,8 @@ async function launchBrowser() {
 async function open(browser, baseUrl, { theme, viewport }) {
   const context = await browser.newContext({
     viewport,
-    deviceScaleFactor: 2,
+    // Phone shots are taken at 2x to stay sharp; desktop shots at 1x to keep the files small.
+    deviceScaleFactor: viewport.width < 600 ? 2 : 1,
     reducedMotion: 'reduce',
   });
   await context.addInitScript((value) => {
@@ -98,7 +99,9 @@ async function main() {
       await shoot(page, `transactions-${theme}`, { fullPage: false });
 
       await tab(page, 'Signals');
-      await shoot(page, `signals-${theme}`);
+      await shoot(page, `signals-${theme}`, {
+        clip: { x: 0, y: 0, width: DESKTOP.width, height: 1500 },
+      });
 
       if (theme === 'light') {
         await tab(page, 'Rules and data');
