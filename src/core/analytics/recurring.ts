@@ -16,6 +16,8 @@ export interface RecurringSignal {
   /** Days between each payment and the next. */
   gapsDays: number[];
   medianGapDays: number;
+  /** Other payments to the same merchant between the first and last payment of the pattern. */
+  otherPayments: number;
   /** The payments that form the pattern, oldest first. */
   payments: CategorisedTxn[];
 }
@@ -78,7 +80,10 @@ function longestMonthlyRun(
  * a group, payments a day or less apart count once. The signal is the longest
  * run of at least `minPayments` payments in which every gap is between
  * `minGapDays` and `maxGapDays`, provided the median gap is between
- * `medianGapMinDays` and `medianGapMaxDays`.
+ * `medianGapMinDays` and `medianGapMaxDays`, the longest and shortest gap
+ * differ by at most `maxGapSpreadDays`, and provided the merchant's other
+ * payments over the same stretch do not outnumber the pattern's own
+ * (`maxOtherPaymentsPerPayment`).
  *
  * This only describes a pattern in past payments. It does not know whether a
  * mandate exists or whether the payment will happen again.
@@ -97,14 +102,30 @@ export function detectRecurring(
     for (const group of groupBySimilarAmount(ofMerchant, params.amountTolerance)) {
       const byDate = [...group].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
       const distinct: CategorisedTxn[] = [];
+      const repeats = new Set<CategorisedTxn>();
       for (const payment of byDate) {
         const last = distinct[distinct.length - 1];
-        if (last && daysBetween(last.date, payment.date) <= params.sameChargeWindowDays) continue;
+        if (last && daysBetween(last.date, payment.date) <= params.sameChargeWindowDays) {
+          repeats.add(payment);
+          continue;
+        }
         distinct.push(payment);
       }
 
       const run = longestMonthlyRun(distinct, params);
       if (run.length < params.minPayments) continue;
+
+      // A merchant paid far more often than monthly (a weekly grocery shop, a
+      // daily tea) will always contain some payments that happen to sit a
+      // month apart. So the pattern's own payments must not be outnumbered by
+      // the merchant's other payments over the same stretch.
+      const from = run[0]!.date;
+      const to = run[run.length - 1]!.date;
+      const otherPayments = ofMerchant.filter(
+        (txn) => txn.date >= from && txn.date <= to && !run.includes(txn) && !repeats.has(txn),
+      ).length;
+      if (otherPayments > run.length * params.maxOtherPaymentsPerPayment) continue;
+
       const gapsDays = run
         .slice(1)
         .map((payment, index) => daysBetween(run[index]!.date, payment.date));
@@ -112,6 +133,9 @@ export function detectRecurring(
       if (medianGapDays < params.medianGapMinDays || medianGapDays > params.medianGapMaxDays) {
         continue;
       }
+      // Regular, not just roughly a month apart: three unrelated payments can
+      // sit 24 and 36 days apart by chance, a real monthly payment does not.
+      if (Math.max(...gapsDays) - Math.min(...gapsDays) > params.maxGapSpreadDays) continue;
 
       const amounts = run.map((payment) => payment.amountPaise);
       const latest = run[run.length - 1]!;
@@ -124,6 +148,7 @@ export function detectRecurring(
         maxPaise: Math.max(...amounts),
         gapsDays,
         medianGapDays,
+        otherPayments,
         payments: run,
       });
     }

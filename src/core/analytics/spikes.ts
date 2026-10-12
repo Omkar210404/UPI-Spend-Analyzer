@@ -1,4 +1,5 @@
 import type { CategoryId } from '../categorise/categories';
+import { categoryLabel } from '../categorise/categories';
 import type { CategorisedTxn } from '../categorise/categoriser';
 import { monthOf } from '../import/dates';
 import type { IsoMonth } from '../types';
@@ -9,7 +10,15 @@ import { groupBy, mean, sum } from './stats';
 export interface TransactionSpike {
   txn: CategorisedTxn;
   category: CategoryId;
-  /** Average of the other money-out payments in the same category. */
+  /**
+   * What the payment was compared with: the user's other payments to the same
+   * merchant, or, when there are too few of those, their other payments in
+   * the same category.
+   */
+  basis: 'merchant' | 'category';
+  /** Plain name of the comparison group, such as "Spice Route Kitchen" or "Health". */
+  basisLabel: string;
+  /** Average of the other payments in the comparison group. */
   averageOthersPaise: number;
   othersCount: number;
   /** This payment divided by that average. */
@@ -18,35 +27,56 @@ export interface TransactionSpike {
 
 /**
  * Unusually large payments: a money-out payment at least `ratio` times the
- * average of the *other* payments in its category (the payment itself is left
- * out of the average), at least `minAmountPaise`, with at least `minOthers`
- * other payments to compare against.
+ * user's own average, and at least `minAmountPaise`.
  *
- * The comparison is only with the user's own payments in this statement.
+ * "Their own average" is the average of their *other* payments to the same
+ * merchant (the payment itself is left out). A merchant paid fewer than
+ * `minOthers` other times has no usable average, so the payment is compared
+ * with the other payments in its category instead. With too few of those as
+ * well, nothing is said.
+ *
+ * Comparing with the merchant first matters: a category mixes ₹30 teas with
+ * ₹1,200 dinners, and against that average every ordinary dinner looks huge.
  */
 export function detectTransactionSpikes(
   txns: readonly CategorisedTxn[],
   params: TransactionSpikeParams = SIGNAL_DEFAULTS.transactionSpike,
 ): TransactionSpike[] {
   const debits = txns.filter((txn) => txn.direction === 'debit');
-  const spikes: TransactionSpike[] = [];
+  const byMerchant = groupBy(debits, (txn) => txn.merchantKey);
+  const byCategory = groupBy(debits, (txn) => txn.category);
+  const totalOf = new Map<CategorisedTxn[], number>();
+  const total = (group: CategorisedTxn[]): number => {
+    let value = totalOf.get(group);
+    if (value === undefined) {
+      value = sum(group.map((txn) => txn.amountPaise));
+      totalOf.set(group, value);
+    }
+    return value;
+  };
 
-  for (const [category, group] of groupBy(debits, (txn) => txn.category)) {
+  const spikes: TransactionSpike[] = [];
+  for (const txn of debits) {
+    if (txn.amountPaise < params.minAmountPaise) continue;
+
+    const merchant = byMerchant.get(txn.merchantKey)!;
+    const category = byCategory.get(txn.category)!;
+    const useMerchant = merchant.length - 1 >= params.minOthers;
+    const group = useMerchant ? merchant : category;
     const othersCount = group.length - 1;
     if (othersCount < params.minOthers) continue;
-    const total = sum(group.map((txn) => txn.amountPaise));
-    for (const txn of group) {
-      if (txn.amountPaise < params.minAmountPaise) continue;
-      const averageOthersPaise = (total - txn.amountPaise) / othersCount;
-      if (averageOthersPaise <= 0 || txn.amountPaise < params.ratio * averageOthersPaise) continue;
-      spikes.push({
-        txn,
-        category: category as CategoryId,
-        averageOthersPaise: Math.round(averageOthersPaise),
-        othersCount,
-        ratio: txn.amountPaise / averageOthersPaise,
-      });
-    }
+
+    const averageOthersPaise = (total(group) - txn.amountPaise) / othersCount;
+    if (averageOthersPaise <= 0 || txn.amountPaise < params.ratio * averageOthersPaise) continue;
+    spikes.push({
+      txn,
+      category: txn.category,
+      basis: useMerchant ? 'merchant' : 'category',
+      basisLabel: useMerchant ? txn.merchantName : categoryLabel(txn.category),
+      averageOthersPaise: Math.round(averageOthersPaise),
+      othersCount,
+      ratio: txn.amountPaise / averageOthersPaise,
+    });
   }
   return spikes.sort((a, b) => b.ratio - a.ratio || b.txn.amountPaise - a.txn.amountPaise);
 }

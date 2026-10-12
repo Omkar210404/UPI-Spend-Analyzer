@@ -63,6 +63,42 @@ describe('recurring payments', () => {
     expect(detectRecurring(txns)).toEqual([]);
   });
 
+  it('does not flag payments about a month apart but not regular', () => {
+    // Gaps of 24 and 36 days: each is "about a month", together they are not a schedule.
+    const txns = build([
+      spec('2026-01-05', 'FRESHBASKET', 348),
+      spec('2026-01-29', 'FRESHBASKET', 350),
+      spec('2026-03-06', 'FRESHBASKET', 345),
+    ]);
+    expect(detectRecurring(txns)).toEqual([]);
+  });
+
+  it('does not pick a monthly pattern out of a shop visited every week', () => {
+    // The 1,000 payments happen to fall a month apart, among many others.
+    const weekly = [640, 1000, 1500, 720, 1310, 1000, 1880, 1640, 760, 1000, 1210, 1930];
+    const txns = build(
+      weekly.map((rupees, index) => {
+        const day = 3 + index * 7;
+        const month = day <= 31 ? 1 : day <= 59 ? 2 : 3;
+        const dayOfMonth = day <= 31 ? day : day <= 59 ? day - 31 : day - 59;
+        return spec(
+          `2026-${String(month).padStart(2, '0')}-${String(dayOfMonth).padStart(2, '0')}`,
+          'GREENLEAF GROCERS',
+          rupees,
+        );
+      }),
+    );
+    expect(detectRecurring(txns)).toEqual([]);
+    // It is the "other payments" limit that rules it out: without it, the three would be flagged.
+    const unguarded = { ...SIGNAL_DEFAULTS.recurring, maxOtherPaymentsPerPayment: 100 };
+    const [coincidence] = detectRecurring(txns, unguarded);
+    expect(coincidence).toMatchObject({
+      typicalPaise: 100000,
+      gapsDays: [28, 28],
+      otherPayments: 6,
+    });
+  });
+
   it('does not flag payments that are quarterly or irregular', () => {
     const quarterly = build([
       spec('2026-01-05', 'SURECOVER INSURANCE', 3000),
@@ -231,12 +267,14 @@ describe('unusually large payments', () => {
     spec(`2026-04-${String(index + 1).padStart(2, '0')}`, 'CHAI CORNER CAFE', rupees),
   );
 
-  it('flags a payment several times the average of the others in its category', () => {
+  it('flags a payment several times the average of the others to the same merchant', () => {
     const txns = build([...ordinary, spec('2026-04-20', 'CHAI CORNER CAFE', 2600)]);
     const [spike, ...rest] = detectTransactionSpikes(txns);
     expect(rest).toEqual([]);
     expect(spike).toMatchObject({
       category: 'food',
+      basis: 'merchant',
+      basisLabel: 'Chai Corner Cafe',
       othersCount: 6,
       averageOthersPaise: 10833, // (120+80+150+90+110+100) / 6 = 108.33
     });
@@ -274,6 +312,30 @@ describe('unusually large payments', () => {
       spec('2026-04-01', 'HILLVIEW LANDLORD RENT', 15000), // large, but alone in its category
     ]);
     expect(detectTransactionSpikes(txns)).toEqual([]);
+  });
+
+  it('falls back to the category average for a merchant with too few payments', () => {
+    // A first visit to a restaurant has no merchant average, so the food category is used.
+    const txns = build([...ordinary, spec('2026-04-20', 'SPICE ROUTE KITCHEN', 2600)]);
+    const [spike, ...rest] = detectTransactionSpikes(txns);
+    expect(rest).toEqual([]);
+    expect(spike).toMatchObject({
+      basis: 'category',
+      basisLabel: 'Food and dining',
+      othersCount: 6,
+      averageOthersPaise: 10833,
+    });
+  });
+
+  it('does not let small payments elsewhere in a category flag a regular big shop', () => {
+    // Milk at 60 drags the groceries average down, but the weekly shop is normal for its own merchant.
+    const milk = Array.from({ length: 12 }, (_, index) =>
+      spec(`2026-04-${String(index + 1).padStart(2, '0')}`, 'A-ONE DAIRY', 60),
+    );
+    const weekly = [1200, 1350, 1100, 1500, 1280, 1420].map((rupees, index) =>
+      spec(`2026-04-${String(index * 4 + 2).padStart(2, '0')}`, 'GREENLEAF GROCERS', rupees),
+    );
+    expect(detectTransactionSpikes(build([...milk, ...weekly]))).toEqual([]);
   });
 });
 

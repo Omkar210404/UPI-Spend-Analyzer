@@ -1,6 +1,7 @@
 import type { Direction, IsoDate } from '../types';
 import { parseAmount, parseMarker, type AmountMarker } from './amounts';
 import { detectDateFormat, parseDate, type DateFormatDetection, type DateFormatId } from './dates';
+import { scrubNarration } from './scrub';
 import type { SensitiveColumn } from './sensitive';
 import { columnValues, headerKind, headerSignature, type HeaderKind, type RawTable } from './table';
 
@@ -329,9 +330,10 @@ export function applyMapping(
   table.rows.forEach((row, index) => {
     const rowNumber = index + 1;
     const dateCell = (row[mapping.date] ?? '').trim();
-    const narration = (row[mapping.narration] ?? '').replace(/\s+/g, ' ').trim();
+    // Card and account fragments are cut out of the narration before anything keeps it.
+    const narration = scrubNarration(row[mapping.narration] ?? '');
     const preview = previewColumns
-      .map((column) => row[column] ?? '')
+      .map((column) => (column === mapping.narration ? narration : (row[column] ?? '')))
       .filter((cell) => cell !== '')
       .join(' | ')
       .slice(0, 160);

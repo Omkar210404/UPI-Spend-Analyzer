@@ -189,7 +189,6 @@ export const DEFAULT_RULES: readonly Rule[] = [
       'DTH',
       'GAS',
       'WATER BILL',
-      'BILL',
       'BILLPAY',
       'BBPS',
       'INSURANCE',

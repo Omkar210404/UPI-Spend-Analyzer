@@ -17,8 +17,16 @@ export const SIGNAL_DEFAULTS = {
     /** The median gap must fall in this range of days ("roughly monthly"). */
     medianGapMinDays: 26,
     medianGapMaxDays: 35,
+    /** The longest and the shortest gap may differ by at most this many days ("regular"). */
+    maxGapSpreadDays: 7,
     /** Payments this close together count once, so a double charge does not break the pattern. */
     sameChargeWindowDays: 1,
+    /**
+     * Between the pattern's first and last payment, the merchant's other
+     * payments may number at most this many per payment in the pattern. This
+     * keeps a shop visited every week from being read as a monthly payment.
+     */
+    maxOtherPaymentsPerPayment: 1,
   },
   duplicates: {
     /** Two payments at most this many days apart. Statements rarely carry a time of day. */
@@ -27,10 +35,13 @@ export const SIGNAL_DEFAULTS = {
     minAmountPaise: 100_00,
   },
   transactionSpike: {
-    /** A payment at least this many times the average of the others in its category. */
+    /**
+     * A payment at least this many times the average of the user's other
+     * payments to the same merchant (or, failing that, in the same category).
+     */
     ratio: 3,
     minAmountPaise: 500_00,
-    /** There must be at least this many other payments to compare against. */
+    /** A merchant, or a category, needs at least this many other payments to give an average. */
     minOthers: 5,
   },
   monthSpike: {
