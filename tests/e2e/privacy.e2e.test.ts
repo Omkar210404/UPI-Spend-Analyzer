@@ -202,7 +202,8 @@ describe('after the page has loaded', () => {
 
     await openTab(page, 'How it works');
     await page.getByRole('button', { name: 'Switch to the dark theme' }).click();
-    expect(await page.locator('html').getAttribute('data-theme')).toBe('dark');
+    // The attribute is set just after the click is handled, so wait for it rather than read once.
+    await expect.poll(() => page.locator('html').getAttribute('data-theme')).toBe('dark');
 
     // Import a CSV file through the mapping step.
     await page.getByRole('button', { name: 'Open another file' }).click();
